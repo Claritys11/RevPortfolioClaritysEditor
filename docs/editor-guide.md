@@ -12,8 +12,8 @@ pnpm dev
 Open [http://127.0.0.1:4317/admin](http://127.0.0.1:4317/admin). The server binds to loopback. Keep it local: the editor has no login/password system and must not be exposed through a tunnel, LAN, public reverse proxy or internet.
 
 The expected sibling repositories are:
-- `../RevisionedPortfolio`: production; the only writable repository.
-- `../RevisionedPortfolioTemplate`: template; read-only compatibility inspection.
+- `../RevPortfolioClaritys`: production; the only writable repository.
+- `../RevPortfolioClaritysTemplate`: template; read-only compatibility inspection.
 
 For non-default paths, copy `.env.example` to `.env.local` and set `PORTFOLIO_REPO_PATH`, `PORTFOLIO_TEMPLATE_PATH` and `EXPECTED_PORTFOLIO_REMOTE`.
 

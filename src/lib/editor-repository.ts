@@ -7,7 +7,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 
 const execFile = promisify(nodeExecFile);
-const DEFAULT_REPOSITORY = path.resolve(process.cwd(), "../RevisionedPortfolio");
+const DEFAULT_REPOSITORY = path.resolve(process.cwd(), "../RevPortfolioClaritys");
 const DEFAULT_TEMPLATE = path.resolve(process.cwd(), "../RevisionedPortfolioTemplate");
 const MAX_ASSET_BYTES = 30 * 1024 * 1024;
 const MANAGED_ROOTS = ["content", path.join("public", "assets")];
@@ -502,7 +502,7 @@ async function performRemoteFetch(): Promise<RemoteFetchResult> {
     git(["remote", "get-url", "origin"]),
     git(["branch", "--show-current"]),
   ]);
-  const expectedRemote = process.env.EXPECTED_PORTFOLIO_REMOTE || "https://github.com/dfbro/RevisionedPortfolio";
+  const expectedRemote = process.env.EXPECTED_PORTFOLIO_REMOTE || "https://github.com/Claritys11/RevPortfolioClaritys";
   if (normalizeRemote(remote) !== normalizeRemote(expectedRemote)) {
     throw new RepositoryError("Fetch blocked: origin does not match the configured portfolio repository.", "REMOTE_MISMATCH");
   }
@@ -619,7 +619,7 @@ export async function repositoryHealth() {
   } catch (error) {
     remoteConnectivity = { ok: false, output: (error as Error).message };
   }
-  const expectedRemote = process.env.EXPECTED_PORTFOLIO_REMOTE || "https://github.com/dfbro/RevisionedPortfolio";
+  const expectedRemote = process.env.EXPECTED_PORTFOLIO_REMOTE || "https://github.com/Claritys11/RevPortfolioClaritys";
   let staticOutput: { ok: boolean; output: string };
   try {
     const root = await repositoryRoot();
@@ -705,7 +705,7 @@ export async function pushRepositoryChanges() {
     git(["remote", "get-url", "origin"]),
     git(["branch", "--show-current"]),
   ]);
-  const expectedRemote = process.env.EXPECTED_PORTFOLIO_REMOTE || "https://github.com/dfbro/RevisionedPortfolio";
+  const expectedRemote = process.env.EXPECTED_PORTFOLIO_REMOTE || "https://github.com/Claritys11/RevPortfolioClaritys";
   if (normalizeRemote(remote) !== normalizeRemote(expectedRemote)) {
     throw new RepositoryError("Push blocked: origin does not match the configured portfolio repository.", "REMOTE_MISMATCH");
   }

@@ -18,7 +18,7 @@ The editor never commits or pushes automatically. Startup fetch is enabled by de
 
 Open **Repository health**. Confirm:
 - Production root is the expected `RevisionedPortfolio` checkout.
-- Production remote is `https://github.com/dfbro/RevisionedPortfolio`.
+- Production remote is `https://github.com/Claritys11/RevPortfolioClaritys`.
 - Current branch is `main`, not detached HEAD.
 - Template root points to `RevisionedPortfolioTemplate`.
 - Template/production contract versions match (currently v1).
@@ -90,14 +90,14 @@ The editor Push action executes `git push` for the current branch after checking
 - branch is not detached.
 
 Default expected remote:
-`https://github.com/dfbro/RevisionedPortfolio`
+`https://github.com/Claritys11/RevPortfolioClaritys`
 
 For a different production remote, set `EXPECTED_PORTFOLIO_REMOTE` in `RevisionedPortfolioEditor/.env.local`, restart the editor and verify the expected/actual remote in Repository health. Do not disable the guard to force a push.
 
 After pushing, verify with:
 
 ```sh
-cd ../RevisionedPortfolio
+cd ../RevPortfolioClaritys
 git status --short --branch
 git log -1 --oneline
 git ls-remote origin refs/heads/main
@@ -105,16 +105,18 @@ git ls-remote origin refs/heads/main
 
 ## 7. Deployment verification
 
-Every push to source `main` triggers `.github/workflows/pages.yml`. Follow both jobs:
+Every push to `main` triggers `.github/workflows/pages.yml`. Follow both jobs:
 
 ```sh
-gh run list --repo dfbro/RevisionedPortfolio --workflow pages.yml --limit 5
-gh run watch <run-id> --repo dfbro/RevisionedPortfolio
+gh run list --repo Claritys11/RevPortfolioClaritys --workflow pages.yml --limit 5
+gh run watch <run-id> --repo Claritys11/RevPortfolioClaritys
 ```
 
-Both `build` and `publish` must succeed. The published site is [https://dfbro.github.io/RevisionedPortfolioSite/](https://dfbro.github.io/RevisionedPortfolioSite/). Verify the homepage, one nested writeup, one image and sitemap.
+Both `build` and `deploy` must succeed. The published site is <https://claritys.web.id>. Verify the homepage, one nested writeup, one image and `sitemap.xml`.
 
-The source repository uses Actions variables `STATIC_SITE_REPOSITORY=dfbro/RevisionedPortfolioSite` and `STATIC_SITE_BRANCH=main`, plus secret `STATIC_SITE_DEPLOY_TOKEN`. The secret must be a fine-grained PAT restricted to the static repository with Contents read/write; see the [source deployment guide](../../RevisionedPortfolio/docs/github-pages.md). Do not substitute the source repository's `GITHUB_TOKEN` because branch-based GitHub Pages does not build from commits pushed with that token.
+Deployment is GitHub-native: the workflow builds `dist/` and publishes it with `actions/upload-pages-artifact` + `actions/deploy-pages` using the repository's own `GITHUB_TOKEN`. There is no separate static-site repository, no deploy PAT and no server. Pages must be set to **Source: GitHub Actions** (`build_type=workflow`) in the production repository's Settings → Pages.
+
+The custom domain lives in the repository's `CNAME` file (`claritys.web.id`) and in the Pages `cname` setting. DNS for the apex and `www` points at `claritys11.github.io`. Changing the domain means updating all three: `CNAME`, the Pages setting, and the DNS records.
 
 ## 8. Common failures
 
@@ -123,6 +125,6 @@ The source repository uses Actions variables `STATIC_SITE_REPOSITORY=dfbro/Revis
 - **Content validation failed:** fix invalid JSON/frontmatter, duplicate slugs, date format or missing assets.
 - **Static output check failed:** rebuild using `pnpm build`, then rerun `pnpm verify:output`.
 - **Git conflict / stale form:** refresh repository data, reopen the file and reconcile the external edit.
-- **Build succeeds but publish fails:** inspect `STATIC_SITE_REPOSITORY`, `STATIC_SITE_BRANCH` and the `STATIC_SITE_DEPLOY_TOKEN` secret. Confirm the token can push to the target repository's configured Pages branch.
-- **Target commit succeeds but Pages has not updated:** check `RevisionedPortfolioSite` → Settings → Pages uses `main` and `/(root)` and inspect the Pages build status.
+- **Build succeeds but deploy fails:** confirm Settings → Pages source is GitHub Actions, not a branch. A branch source rejects the artifact deployment.
+- **Deploy succeeds but the domain 404s or serves a stale certificate:** check that `CNAME`, the Pages `cname` setting and the DNS records agree, then re-check `gh api repos/Claritys11/RevPortfolioClaritys/pages --jq '.status,.cname,.https_enforced'`.
 - **Pages workflow failed:** inspect the failed Actions step; do not assume a successful source Git push means a successful publication.

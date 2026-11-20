@@ -1,15 +1,25 @@
-# RevisionedPortfolioEditor
+# RevPortfolioClaritysEditor
 
 A local-only CMS for the maintained static portfolio repository. The editor keeps no editorial database: the configured production Git repository is the content source of truth.
 
-## Run
+This checkout is wired to the `Claritys11` forks that serve <https://claritys.web.id>. It runs on any machine — PC or laptop — and is never deployed; only the portfolio repository is published.
+
+## Setup on a new machine
+
+Clone the editor and the portfolio as siblings so the defaults resolve without configuration:
 
 ```sh
+mkdir -p ~/portfolio && cd ~/portfolio
+git clone https://github.com/Claritys11/RevPortfolioClaritysEditor.git
+git clone https://github.com/Claritys11/RevPortfolioClaritys.git
+cd RevPortfolioClaritysEditor
 pnpm install
 pnpm dev
 ```
 
-The app binds to `127.0.0.1:4317`. Do not expose it through LAN, a tunnel or a public reverse proxy.
+Requires Node.js 22+ and pnpm 11+. The app binds to `127.0.0.1:4317`. Do not expose it through LAN, a tunnel or a public reverse proxy.
+
+Git pushes use the machine's own GitHub credentials (`gh auth login` or a credential helper). Nothing secret lives in this repository; `.env.local` is gitignored and optional.
 
 Start with [docs/editor-guide.md](docs/editor-guide.md) for the CRUD workflow and [docs/git-and-publish.md](docs/git-and-publish.md) for review, Commit, Push and deployment verification.
 
@@ -17,15 +27,16 @@ Start with [docs/editor-guide.md](docs/editor-guide.md) for the CRUD workflow an
 
 | Repository | Role | Editor access |
 | --- | --- | --- |
-| `RevisionedPortfolioEditor` | Local CMS, forms, import adapters and Git actions | Application source; loopback-only runtime |
-| `RevisionedPortfolioTemplate` | Reusable static site source and versioned content contract | Read-only compatibility check |
-| `RevisionedPortfolio` | Production website source, content/assets, static build, and GitHub Pages deployment | Read/write; only editor commit/push target |
+| `Claritys11/RevPortfolioClaritysEditor` | Local CMS, forms, import adapters and Git actions | Application source; loopback-only runtime |
+| `RevisionedPortfolioTemplate` | Reusable static site source and versioned content contract | Read-only compatibility check; optional |
+| `Claritys11/RevPortfolioClaritys` | Production website source, content/assets, static build, and GitHub Pages deployment | Read/write; only editor commit/push target |
 
-The editor defaults to sibling `../RevisionedPortfolio` for production and `../RevisionedPortfolioTemplate` for the template. Configure overrides in a local `.env.local`:
+The editor defaults to sibling `../RevPortfolioClaritys` for production and `../RevisionedPortfolioTemplate` for the template. The template checkout is optional — without it, Repository health reports the template as unavailable and everything else works. Configure overrides in a local `.env.local` (see `.env.example`):
 
 - `PORTFOLIO_REPO_PATH`: the only repository the editor may write, commit and push.
 - `PORTFOLIO_TEMPLATE_PATH`: template repository path, inspected read-only.
-- `EXPECTED_PORTFOLIO_REMOTE`: exact production `origin` URL accepted by the Push guard; defaults to `https://github.com/dfbro/RevisionedPortfolio`.
+- `EXPECTED_PORTFOLIO_REMOTE`: exact production `origin` URL accepted by the Push guard; defaults to `https://github.com/Claritys11/RevPortfolioClaritys`.
+- `EDITOR_AUTO_FETCH`: fast-forward a clean production branch once at server boot; defaults to `false`.
 
 A template manifest with `role: template` is rejected as a write target. Do not point both environment variables to the same checkout.
 
@@ -67,4 +78,4 @@ The source production repository remains the only source of content truth. The p
 - [Git and publishing: diff, Commit, Push and GitHub Actions](docs/git-and-publish.md)
 - [Migration runbook](docs/migration-runbook.md)
 - [Legacy schema and adapter mapping](docs/migration-adapters.md)
-- [Workspace operations](../docs/WORKSPACE-GUIDE.md)
+- Workspace operations: see the homelab workspace guide on the originating machine (not part of this repository)

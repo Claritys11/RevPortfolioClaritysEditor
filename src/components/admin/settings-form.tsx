@@ -40,7 +40,7 @@ export function SettingsForm({ site, appearance, siteHash, appearanceHash }: { s
           <Field label="Canonical origin" name="url" error={errors.url}>
             <Input id="url" name="url" type="url" defaultValue={site.url} required />
           </Field>
-          <p className="-mt-2 text-xs text-muted-foreground">Origin only, e.g. https://dfbro.my.id. Do not append a repository or page path.</p>
+          <p className="-mt-2 text-xs text-muted-foreground">Origin only, e.g. https://claritys.web.id. Do not append a repository or page path.</p>
           <Field label="Base path" name="basePath" error={errors.basePath}>
             <Input id="basePath" name="basePath" defaultValue={site.basePath || "/"} required />
           </Field>
