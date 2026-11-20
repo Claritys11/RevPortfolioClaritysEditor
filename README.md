@@ -23,22 +23,20 @@ Git pushes use the machine's own GitHub credentials (`gh auth login` or a creden
 
 Start with [docs/editor-guide.md](docs/editor-guide.md) for the CRUD workflow and [docs/git-and-publish.md](docs/git-and-publish.md) for review, Commit, Push and deployment verification.
 
-## Three-repository model
+## Two-repository model
 
 | Repository | Role | Editor access |
 | --- | --- | --- |
 | `Claritys11/RevPortfolioClaritysEditor` | Local CMS, forms, import adapters and Git actions | Application source; loopback-only runtime |
-| `RevisionedPortfolioTemplate` | Reusable static site source and versioned content contract | Read-only compatibility check; optional |
 | `Claritys11/RevPortfolioClaritys` | Production website source, content/assets, static build, and GitHub Pages deployment | Read/write; only editor commit/push target |
 
-The editor defaults to sibling `../RevPortfolioClaritys` for production and `../RevisionedPortfolioTemplate` for the template. The template checkout is optional — without it, Repository health reports the template as unavailable and everything else works. Configure overrides in a local `.env.local` (see `.env.example`):
+The editor defaults to the sibling checkout `../RevPortfolioClaritys`. No template repository is required. Configure overrides in a local `.env.local` (see `.env.example`):
 
 - `PORTFOLIO_REPO_PATH`: the only repository the editor may write, commit and push.
-- `PORTFOLIO_TEMPLATE_PATH`: template repository path, inspected read-only.
 - `EXPECTED_PORTFOLIO_REMOTE`: exact production `origin` URL accepted by the Push guard; defaults to `https://github.com/Claritys11/RevPortfolioClaritys`.
 - `EDITOR_AUTO_FETCH`: fast-forward a clean production branch once at server boot; defaults to `false`.
 
-A template manifest with `role: template` is rejected as a write target. Do not point both environment variables to the same checkout.
+A manifest with `role: template` is rejected as a write target, so an upstream template checkout can never be committed to by accident.
 
 ## Features
 
@@ -49,7 +47,7 @@ A template manifest with `role: template` is rejected as a write target. Do not 
 - Explicit GitHub Pages custom-domain synchronization with a browser confirmation; existing workflow publishing mode/source are preserved.
 - Public asset manager.
 - Production Git status, managed-path diff, validation, startup remote fetch, manual fetch, explicit commit and guarded push.
-- Template identity and content contract compatibility check.
+- Content health: writeup/project/certificate inventory, draft counts, broken asset references and unreferenced uploads, computed locally from the production working tree.
 - Migration Tools workbench with the legacy schema map and future adapter pipeline.
 
 ## Legacy migration
@@ -70,7 +68,7 @@ See [docs/migration-runbook.md](docs/migration-runbook.md) and [docs/migration-a
 - Startup/manual fetch only fast-forwards a clean branch tracking `origin/*`; dirty or diverged branches are left untouched.
 - Diagnostics never reset, clean, rebase or repair Git state.
 
-The source production repository remains the only source of content truth. The public static site is built from that repository's `dist/` artifact; there is no separate active `RevisionedPortfolioSite` Git repository. The editor's GitHub Pages action changes only the repository custom-domain setting. DNS records and TLS activation are separate infrastructure operations. Template files are not synchronized automatically, and migration imports require a future dry-run/approval workflow before production writes.
+The source production repository remains the only source of content truth. The public static site is built from that repository's `dist/` artifact; there is no separate active `RevisionedPortfolioSite` Git repository. The editor's GitHub Pages action changes only the repository custom-domain setting. DNS records and TLS activation are separate infrastructure operations. Migration imports require a future dry-run/approval workflow before production writes.
 
 ## Documentation
 

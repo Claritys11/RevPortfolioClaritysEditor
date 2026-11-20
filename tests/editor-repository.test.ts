@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { commitRepositoryChanges, deleteRepoFile, fetchPortfolioRemote, listAssets, readAsset, readRepoSnapshot, repoPath, repositoryDiff, repositoryRoot, repositoryStatus, templateRepositoryStatus, pushRepositoryChanges, writeAsset, writeRepoJson, writeRepoText } from "@/lib/editor-repository";
+import { commitRepositoryChanges, deleteRepoFile, fetchPortfolioRemote, listAssets, readAsset, readRepoSnapshot, repoPath, repositoryDiff, repositoryRoot, repositoryStatus, pushRepositoryChanges, writeAsset, writeRepoJson, writeRepoText } from "@/lib/editor-repository";
 
 const execFile = promisify(nodeExecFile);
 
@@ -71,18 +71,6 @@ describe("repository filesystem boundary", () => {
     const root = await makeRepo();
     await rm(path.join(root, "portfolio.repo.json"));
     await expect(repositoryRoot()).rejects.toMatchObject({ code: "MISSING_REPOSITORY_MANIFEST" });
-  });
-
-  it("inspects the configured template as a separate read-only Git repository", async () => {
-    const root = await makeRepo();
-    const template = path.join(root, "template");
-    await mkdir(template);
-    await git(template, ["init", "-b", "main"]);
-    await writeFile(path.join(template, "portfolio.repo.json"), JSON.stringify({ schemaVersion: 1, role: "template", templateName: "Portfolio Base", templateVersion: "1.0.0", contractVersion: 1 }));
-    vi.stubEnv("PORTFOLIO_TEMPLATE_PATH", template);
-
-    const status = await templateRepositoryStatus();
-    expect(status).toMatchObject({ ok: true, root: template, templateName: "Portfolio Base", templateVersion: "1.0.0", contractVersion: 1, branch: "main" });
   });
 
   it("exposes the production template pin for a compatibility check", async () => {

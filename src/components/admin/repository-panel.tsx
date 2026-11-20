@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/admin/field";
+import { formatBytes } from "@/lib/format";
+import type { ContentHealth } from "@/lib/content-health";
 import {
   commitRepositoryAction,
   fetchRepositoryRemoteAction,
@@ -26,11 +28,9 @@ function StateLine({ label, ok, detail }: { label: string; ok: boolean; detail?:
   );
 }
 
-type TemplateStatus =
-  | { ok: true; root: string; branch: string; remote: string; status: string; templateName: string; templateVersion: string; contractVersion: number }
-  | { ok: false; error: string };
+type ContentHealthData = ContentHealth;
 
-export function RepositoryPanel({ initial, template }: { initial: { root: string; remote: string; branch: string; status: string; diffStat: string; diffCheck: { ok: boolean; output: string }; upstream: string | null; ahead: number; behind: number; instanceName: string; templateName: string; templateContractVersion: number }; template: TemplateStatus }) {
+export function RepositoryPanel({ initial, content }: { initial: { root: string; remote: string; branch: string; status: string; diffStat: string; diffCheck: { ok: boolean; output: string }; upstream: string | null; ahead: number; behind: number; instanceName: string; templateName: string; templateContractVersion: number }; content: ContentHealthData }) {
   const router = useRouter();
   const [health, setHealth] = useState<HealthData | null>(null);
   const [diff, setDiff] = useState<{ stat: string; patch: string } | null>(null);
@@ -101,24 +101,79 @@ export function RepositoryPanel({ initial, template }: { initial: { root: string
       </section>
 
       <section className="grid gap-3">
-        <h2 className="meta">reusable template · read only</h2>
-        {template.ok ? (
-          <div className="rounded-md border border-border p-4 text-sm">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="font-medium">{template.templateName} <span className="meta ml-2">v{template.templateVersion}</span></p>
-              <span className="meta rounded-full border border-border px-2 py-1">contract v{template.contractVersion}</span>
+        <h2 className="meta">content health · read only</h2>
+        {content.ok ? (
+          <div className="grid gap-3">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-md border border-border p-4">
+                <p className="meta text-muted-foreground">writeups</p>
+                <p className="mt-1 font-display text-3xl font-bold">{content.inventory.writeups.total}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{content.inventory.writeups.published} published · {content.inventory.writeups.draft} draft</p>
+              </div>
+              <div className="rounded-md border border-border p-4">
+                <p className="meta text-muted-foreground">projects</p>
+                <p className="mt-1 font-display text-3xl font-bold">{content.inventory.projects.total}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{content.inventory.projects.withImage} with an image</p>
+              </div>
+              <div className="rounded-md border border-border p-4">
+                <p className="meta text-muted-foreground">certificates</p>
+                <p className="mt-1 font-display text-3xl font-bold">{content.inventory.achievements.total}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{content.inventory.achievements.withImage} image · {content.inventory.achievements.withDocument} document</p>
+              </div>
             </div>
-            <StateLine
-              label="Production compatibility"
-              ok={initial.templateName === template.templateName && initial.templateContractVersion === template.contractVersion}
-              detail={`Production expects ${initial.templateName} contract v${initial.templateContractVersion}; loaded ${template.templateName} contract v${template.contractVersion}.`}
-            />
-            <p className="mt-2 break-all font-mono text-xs text-muted-foreground">{template.root}</p>
-            <p className="mt-1 break-all text-xs text-muted-foreground">{template.remote || "No origin remote"} · branch {template.branch || "detached HEAD"}</p>
-            <p className="mt-2 text-xs text-muted-foreground">Inspected only. Content saves, commits and pushes below target the production repository shown above.</p>
+            <div className="rounded-md border border-border px-3">
+              <StateLine
+                label="Asset references"
+                ok={content.assets.missing.length === 0}
+                detail={content.assets.missing.length === 0 ? `All ${content.assets.referencedUploads} referenced uploads resolve to files on disk.` : `${content.assets.missing.length} reference(s) point at files that do not exist.`}
+              />
+              <StateLine
+                label="Unreferenced uploads"
+                ok={content.assets.orphaned.length === 0}
+                detail={content.assets.orphaned.length === 0 ? `Every one of the ${content.assets.uploads} uploads is referenced by content.` : `${content.assets.orphaned.length} of ${content.assets.uploads} uploads (${formatBytes(content.assets.orphanedBytes)}) are not referenced by any content file.`}
+              />
+              <StateLine
+                label="Draft writeups"
+                ok={content.inventory.writeups.draft === 0}
+                detail={content.inventory.writeups.draft === 0 ? "No drafts pending." : `${content.inventory.writeups.draft} draft(s) are saved but excluded from the published site.`}
+              />
+              <StateLine
+                label="Upload storage"
+                ok
+                detail={`${content.assets.uploads} files · ${formatBytes(content.assets.uploadBytes)} · ${content.assets.external} external and ${content.assets.unmanaged} unmanaged URL(s) not inspected`}
+              />
+            </div>
+            {content.assets.missing.length > 0 && (
+              <details className="rounded-md border border-destructive/40 p-3">
+                <summary className="cursor-pointer text-sm text-destructive">Broken references ({content.assets.missing.length})</summary>
+                <ul className="mt-3 grid gap-2 text-xs">
+                  {content.assets.missing.map((item) => (
+                    <li key={item.url} className="break-all">
+                      <span className="font-mono">{item.url}</span>
+                      <span className="text-muted-foreground"> — {item.sources.join(", ")}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+            {content.assets.orphaned.length > 0 && (
+              <details className="rounded-md border border-border p-3">
+                <summary className="cursor-pointer text-sm">Unreferenced uploads ({content.assets.orphaned.length})</summary>
+                <ul className="mt-3 grid gap-1 text-xs">
+                  {content.assets.orphaned.map((item) => (
+                    <li key={item.name} className="flex justify-between gap-3 break-all">
+                      <span className="font-mono">{item.name}</span>
+                      <span className="shrink-0 text-muted-foreground">{formatBytes(item.bytes)}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-xs text-muted-foreground">Nothing is deleted automatically. Remove files manually only after confirming they are unused.</p>
+              </details>
+            )}
+            <p className="text-xs text-muted-foreground">Computed from the production working tree on each page load. No network calls, no writes.</p>
           </div>
         ) : (
-          <p className="rounded-md border border-destructive/40 p-3 text-sm text-destructive">Template unavailable: {template.error}. Check PORTFOLIO_TEMPLATE_PATH.</p>
+          <p className="rounded-md border border-destructive/40 p-3 text-sm text-destructive">Content inspection failed: {content.error}</p>
         )}
       </section>
 

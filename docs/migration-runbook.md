@@ -39,7 +39,7 @@ It requests the public sitemap, public HTML/Markdown exports and public upload p
 It defaults to the former domain. Always set `PORTFOLIO_SOURCE_URL` explicitly to an origin you are authorized to read:
 
 ```sh
-cd /home/wilhelm/workspaceAI/RevisionedPortfolio
+cd ../RevPortfolioClaritys
 PORTFOLIO_SOURCE_URL=https://authorized-old-site.example \
   python3 legacy-archive/website-runtime-2026-11-09/migrate-live-snapshot.py
 ```
@@ -72,7 +72,7 @@ The target format is:
 - `content/writeups/<slug>.md`: one article per slug, JSON-compatible frontmatter and Markdown/HTML body.
 - `public/assets/uploads/`: public media and documents.
 
-See [template content contract](../../RevisionedPortfolioTemplate/docs/content-contract.md).
+The production repository's `portfolio.repo.json` pins the content contract version (currently v1).
 
 ## 6. Validate before production changes
 

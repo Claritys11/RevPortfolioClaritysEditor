@@ -8,22 +8,21 @@
 | Commit | Repository health action | Creates a local Git commit |
 | Fetch | Editor startup or Repository health action | Fetches `origin`; fast-forwards only a clean branch that is behind its `origin/*` upstream |
 | Push | Repository health action | Sends existing local commits to `origin` |
-| Build | GitHub Actions in `RevisionedPortfolio` | Runs validation and creates the `out/` static export |
-| Publish | Publish job in the same workflow | Transfers `out/` to `RevisionedPortfolioSite` using a dedicated cross-repository token |
-| Pages | Branch publishing in `RevisionedPortfolioSite` | Serves `main` → `/(root)` |
+| Build | GitHub Actions in `RevPortfolioClaritys` | Runs validation and creates the `dist/` static export |
+| Publish | Deploy job in the same workflow | Uploads `dist/` with `actions/upload-pages-artifact` and deploys via `actions/deploy-pages` |
+| Pages | GitHub-native Pages (`build_type=workflow`) | Serves the deployed artifact at `https://claritys.web.id` |
 
-The editor never commits or pushes automatically. Startup fetch is enabled by default; it does not overwrite dirty or diverged work.
+The editor never commits or pushes automatically. Startup fetch is disabled by default (`EDITOR_AUTO_FETCH=false`); when enabled it never overwrites dirty or diverged work.
 
 ## 2. Check repository identity first
 
 Open **Repository health**. Confirm:
-- Production root is the expected `RevisionedPortfolio` checkout.
+- Production root is the expected `RevPortfolioClaritys` checkout.
 - Production remote is `https://github.com/Claritys11/RevPortfolioClaritys`.
 - Current branch is `main`, not detached HEAD.
-- Template root points to `RevisionedPortfolioTemplate`.
-- Template/production contract versions match (currently v1).
+- Content health reports no broken asset references.
 
-The template is read-only. Commit and Push buttons target only the production repository.
+Commit and Push buttons target only the production repository. Content health is read-only and never deletes files.
 
 ## 3. Review changes
 
@@ -55,7 +54,7 @@ Select **Run health check**. The current doctor checks:
 - repository root and expected remote;
 - `git fsck --full --strict` object integrity;
 - content validation;
-- static-output validation against the current `out/` build;
+- static-output validation against the current `dist/` build;
 - remote reachability;
 - `git diff --check`;
 - working-tree state.
@@ -67,7 +66,7 @@ The doctor is diagnostic, not a repair tool. It never resets, cleans, rebases, p
 Before committing, run the full production checks in a terminal when feasible:
 
 ```sh
-cd ../RevisionedPortfolio
+cd ../RevPortfolioClaritys
 pnpm check
 pnpm verify:content
 pnpm verify:output

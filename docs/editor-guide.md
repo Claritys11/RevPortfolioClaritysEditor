@@ -11,11 +11,10 @@ pnpm dev
 
 Open [http://127.0.0.1:4317/admin](http://127.0.0.1:4317/admin). The server binds to loopback. Keep it local: the editor has no login/password system and must not be exposed through a tunnel, LAN, public reverse proxy or internet.
 
-The expected sibling repositories are:
+The expected sibling repository is:
 - `../RevPortfolioClaritys`: production; the only writable repository.
-- `../RevPortfolioClaritysTemplate`: template; read-only compatibility inspection.
 
-For non-default paths, copy `.env.example` to `.env.local` and set `PORTFOLIO_REPO_PATH`, `PORTFOLIO_TEMPLATE_PATH` and `EXPECTED_PORTFOLIO_REMOTE`.
+For non-default paths, copy `.env.example` to `.env.local` and set `PORTFOLIO_REPO_PATH` and `EXPECTED_PORTFOLIO_REMOTE`.
 
 ## 2. Navigation
 
@@ -69,7 +68,7 @@ To delete, use the row's Delete action and confirm. Deleting an article does not
 
 **Appearance & SEO** edits the canonical site URL, language, title/description, trailing-slash setting, default theme, typography, radius and light/dark color tokens.
 
-The published project URL is currently `https://dfbro.github.io/RevisionedPortfolioSite/`. The editor still writes only to the source repository `RevisionedPortfolio`; the source workflow derives `basePath`, canonical metadata, sitemap, robots and article exports from the `STATIC_SITE_REPOSITORY` Actions variable. Do not treat a profile website link as a DNS or Pages configuration change.
+The published site is `https://claritys.web.id`. The editor writes only to the source repository `RevPortfolioClaritys`; its GitHub Pages workflow derives `basePath`, canonical metadata, sitemap, robots and article exports from the site settings. Do not treat a profile website link as a DNS or Pages configuration change.
 
 ## 6. Assets
 
