@@ -162,6 +162,9 @@ export const ProfileSchema = z.object({
   // Loose: legacy rows carry extra keys (siteName, canonicalUrl, heroAnimatedTitles, …) that must survive a save.
   seo: jsonField(
     z.looseObject({
+      siteName: z.string().max(160).optional(),
+      defaultTitle: z.string().max(160).optional(),
+      titleTemplate: z.string().max(160).optional(),
       jobTitle: z.string().max(120).optional(),
       locale: z.string().max(20).optional(),
       description: z.string().max(1000).optional(),

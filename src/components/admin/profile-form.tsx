@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { saveProfile } from "@/lib/admin/actions/profile";
 
-type Seo = Record<string, unknown> & { jobTitle?: string; locale?: string; description?: string; keywords: string[]; sameAs: string[] };
+type Seo = Record<string, unknown> & { siteName?: string; defaultTitle?: string; titleTemplate?: string; jobTitle?: string; locale?: string; description?: string; keywords: string[]; sameAs: string[] };
 
 export type ProfileInitial = {
   expectedHash: string;
@@ -115,6 +115,9 @@ export function ProfileForm({ initial }: { initial: ProfileInitial }) {
       </Field>
       <fieldset className="grid gap-4 rounded-md border border-border p-4">
         <legend className="meta px-2">SEO</legend>
+        <p className="meta text-muted-foreground">
+          Keywords here are merged automatically with every published writeup/project category, competition and tag — add new content and the meta keywords grow with it.
+        </p>
         <SeoFields initial={initial.seo} error={f.seo} />
       </fieldset>
       {state.message && !state.ok && <p className="text-sm text-destructive">{state.message}</p>}
@@ -143,7 +146,7 @@ function SeoFields({ initial, error }: { initial: Seo; error?: string[] }) {
       <Input aria-label="Home page title" placeholder="Home page title (Google result headline)" value={String(seo.defaultTitle ?? "")} onChange={(e) => setSeo({ ...seo, defaultTitle: e.target.value })} />
       <Input aria-label="Title template" placeholder="Title template, %s = page title (e.g. %s | Elang Dimas Syadewa)" value={String(seo.titleTemplate ?? "")} onChange={(e) => setSeo({ ...seo, titleTemplate: e.target.value })} />
       <Input aria-label="Job title" placeholder="Job title" value={seo.jobTitle ?? ""} onChange={(e) => setSeo({ ...seo, jobTitle: e.target.value })} />
-      <Input aria-label="Locale" placeholder="Locale (id_ID)" value={seo.locale ?? ""} onChange={(e) => setSeo({ ...seo, locale: e.target.value })} />
+      <Input aria-label="Locale" placeholder="Locale (en_US or id_ID)" value={seo.locale ?? ""} onChange={(e) => setSeo({ ...seo, locale: e.target.value })} />
       <Textarea aria-label="Description" placeholder="Meta description" value={seo.description ?? ""} onChange={(e) => setSeo({ ...seo, description: e.target.value })} />
       <Textarea aria-label="Keywords" placeholder="Keywords, comma separated" value={list("keywords")} onChange={(e) => setList("keywords", e.target.value)} />
       <Textarea aria-label="Same as" placeholder="Profile URLs, comma separated" value={list("sameAs")} onChange={(e) => setList("sameAs", e.target.value)} />
