@@ -91,7 +91,7 @@ The editor Push action executes `git push` for the current branch after checking
 Default expected remote:
 `https://github.com/Claritys11/RevPortfolioClaritys`
 
-For a different production remote, set `EXPECTED_PORTFOLIO_REMOTE` in `RevisionedPortfolioEditor/.env.local`, restart the editor and verify the expected/actual remote in Repository health. Do not disable the guard to force a push.
+For a different production remote, set `EXPECTED_PORTFOLIO_REMOTE` in `RevPortfolioClaritysEditor/.env.local`, restart the editor and verify the expected/actual remote in Repository health. Do not disable the guard to force a push.
 
 After pushing, verify with:
 

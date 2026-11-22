@@ -68,7 +68,7 @@ See [docs/migration-runbook.md](docs/migration-runbook.md) and [docs/migration-a
 - Startup/manual fetch only fast-forwards a clean branch tracking `origin/*`; dirty or diverged branches are left untouched.
 - Diagnostics never reset, clean, rebase or repair Git state.
 
-The source production repository remains the only source of content truth. The public static site is built from that repository's `dist/` artifact; there is no separate active `RevisionedPortfolioSite` Git repository. The editor's GitHub Pages action changes only the repository custom-domain setting. DNS records and TLS activation are separate infrastructure operations. Migration imports require a future dry-run/approval workflow before production writes.
+The source production repository remains the only source of content truth. The public static site is built from that repository's `dist/` artifact; there is no separate active static-site Git repository. The editor's GitHub Pages action changes only the repository custom-domain setting. DNS records and TLS activation are separate infrastructure operations. Migration imports require a future dry-run/approval workflow before production writes.
 
 ## Documentation
 

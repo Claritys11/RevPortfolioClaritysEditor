@@ -4,7 +4,7 @@ import { editorAssetPreviewUrl, isPdfAssetUrl } from "@/lib/asset-preview";
 describe("editorAssetPreviewUrl", () => {
   it("routes uploaded assets through the local editor preview API", () => {
     expect(editorAssetPreviewUrl("/assets/uploads/certificate.png")).toBe("/api/admin/upload/certificate.png");
-    expect(editorAssetPreviewUrl("https://dfbro.my.id/RevisionedPortfolio/assets/uploads/certificate%20one.png")).toBe("/api/admin/upload/certificate%20one.png");
+    expect(editorAssetPreviewUrl("https://claritys.web.id/RevPortfolioClaritys/assets/uploads/certificate%20one.png")).toBe("/api/admin/upload/certificate%20one.png");
   });
 
   it("routes root-relative public files through the public preview API", () => {
@@ -21,7 +21,7 @@ describe("editorAssetPreviewUrl", () => {
 describe("isPdfAssetUrl", () => {
   it("recognizes PDF sources but not generated image previews", () => {
     expect(isPdfAssetUrl("/assets/uploads/source.pdf")).toBe(true);
-    expect(isPdfAssetUrl("https://dfbro.my.id/assets/uploads/source.PDF?download=1")).toBe(true);
+    expect(isPdfAssetUrl("https://claritys.web.id/assets/uploads/source.PDF?download=1")).toBe(true);
     expect(isPdfAssetUrl("/assets/uploads/preview.png")).toBe(false);
     expect(isPdfAssetUrl(null)).toBe(false);
   });
